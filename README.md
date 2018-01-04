@@ -31,7 +31,11 @@ git clone https://github.com/facebook/WebDriverAgent.git
 ./Scripts/bootstrap.sh
 ```
 脚本运行需要[`Carthage`](https://github.com/Carthage/Carthage)和`npm`, 这两个都是用来安装WDA的依赖包的, 看样子是依赖了node和iOS两种生态, 分别负责原生和Web两个模块, 安装`carthage`直接 `brew install carthage`.
+
+
 3. 用Xcode打开文件夹里的 `WebDriverAgent.xcodeproj`
+
+
 4. 如果是真机调试, 连接iOS设备后需要iOS开发者签名, 这一部分不做说明, 跟正常iOS开发一样, 需要注意的是, 要对项目内`WebDriverAgentLib`, `WebDriverRunner`, `integrationApp`都需填入开发者签名. 提供一个很好的中文参考文档[iOS 真机如何安装 WebDriverAgent](https://testerhome.com/topics/7220). 还有就是国行的iOS设备需要端口转发才能访问, 需要将手机的端口转发到Mac上. 使用工具`imobiledevice`即可
 ```
 $ brew install imobiledevice
@@ -39,15 +43,15 @@ $ iproxy 8100 8100
 ```
 
 
-WDA运行测试: [Product] -> [test], 或者`CMD + U`. 之后iOS设备会安装一个WebDriverAgent App, 自动打开黑屏然后自动退出, 期间不用管它, 如果迟迟不退出, 有可能是失败了, 断开设备重连再运行test(还是失败可以删除App再试一试).
+运行WDA的test: [Product] -> [test], 或者`CMD + U`. 之后iOS设备会安装一个WebDriverAgent App, 自动打开黑屏然后自动退出, 期间不用管它, 如果迟迟不退出, 有可能是失败了, 断开设备重连再运行test(还是失败可以删除App再试一试). 在App退出之后就可以正确运行js脚本了.
 
 
 ## 运行脚本
-WDA启动之后, 可以尝试打开`http://127.0.0.1:8100/status`查看设备状态, 正常情况会有JSON返回, 打开`http://127.0.0.1:8100/inspector`会这样
+WDA启动之后, 可以尝试打开`http://127.0.0.1:8100/status`查看设备状态, 正常情况会有JSON返回, 打开`http://127.0.0.1:8100/inspector`会是这样
 ![](./inspec.jpg)
 
 
-其他API看[这里](https://github.com/facebook/WebDriverAgent/wiki/Queries), 其实这里的Wiki也不全, 我看过WDA源码之后找到这个[文件](https://github.com/facebook/WebDriverAgent/blob/master/WebDriverAgentLib/Commands/FBElementCommands.m#L60)应该是完整的API代码, 比较语义化, 应该能看得懂(主要会用到`screenshot`和`touchAndHold`的API).
+其他API看[这里](https://github.com/facebook/WebDriverAgent/wiki/Queries), 其实这里的Wiki也不全, 我看过WDA源码之后找到这个[文件](https://github.com/facebook/WebDriverAgent/blob/master/WebDriverAgentLib/Commands/FBElementCommands.m#L60), 里面应该是完整的API代码, 比较语义化, 应该能看得懂(主要会用到`screenshot`和`touchAndHold`的API).
 
 
 一切正常之后, 运行
