@@ -52,6 +52,12 @@ $ iproxy 8100 8100
 运行WDA的test: [Product] -> [test], 或者`CMD + U`. 之后iOS设备会安装一个WebDriverAgent App, 自动打开黑屏然后自动退出, 期间不用管它, 如果迟迟不退出, 有可能是失败了, 断开设备重连再运行test(还是失败可以删除App再试一试). 在App退出之后就可以正确运行js脚本了.
 
 
+然后在项目根目录安装npm依赖, 运行:
+```
+npm i
+```
+
+
 ## 运行脚本
 WDA启动之后, 可以尝试打开`http://127.0.0.1:8100/status`查看设备状态, 正常情况会有JSON返回, 打开`http://127.0.0.1:8100/inspector`会是这样
 ![](./inspec.jpg)
