@@ -16,7 +16,7 @@
 
 
 ## 需要环境
-(括号里是我使用的版本, 别的版本未经实验不保证成功)
+(括号里是我使用的版本, 别的版本未经实验不保证成功, 机型: Iphone7)
 - Nodejs (v9.3.0)
 - NPM (v5.5.1)
 - xcode (v9.2)
@@ -60,7 +60,7 @@ WDA启动之后, 可以尝试打开`http://127.0.0.1:8100/status`查看设备状
 其他API看[这里](https://github.com/facebook/WebDriverAgent/wiki/Queries), 其实这里的Wiki也不全, 我看过WDA源码之后找到这个[文件](https://github.com/facebook/WebDriverAgent/blob/master/WebDriverAgentLib/Commands/FBElementCommands.m#L60), 里面应该是完整的API代码, 比较语义化, 应该能看得懂(主要会用到`screenshot`和`touchAndHold`的API).
 
 
-一切正常之后, 运行
+一切正常之后, 打开微信跳一跳, 开始游戏后运行
 ```
 npm start
 ```
