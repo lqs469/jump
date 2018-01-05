@@ -44,7 +44,7 @@ git clone https://github.com/facebook/WebDriverAgent.git
 
 4. 如果是真机调试, 连接iOS设备后需要iOS开发者签名, 这一部分不做说明, 跟正常iOS开发一样, 需要注意的是, 要对项目内`WebDriverAgentLib`, `WebDriverRunner`, `integrationApp`都需填入开发者签名. 提供一个很好的中文参考文档[iOS 真机如何安装 WebDriverAgent](https://testerhome.com/topics/7220). 还有就是国行的iOS设备需要端口转发才能访问, 需要将手机的端口转发到Mac上. 使用工具`imobiledevice`即可
 ```
-$ brew install imobiledevice
+$ brew install libimobiledevice
 $ iproxy 8100 8100
 ```
 
