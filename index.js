@@ -1,6 +1,7 @@
 import fetch from 'node-fetch'
 import fs from 'fs'
 import getPixels from 'get-pixels'
+import savePixels from 'save-pixels'
 
 const url = 'http://127.0.0.1:8100'
 var sid = ''
@@ -68,7 +69,7 @@ function saveImg (screenshot, filename) {
     screenshot = new Buffer(screenshot, 'base64').toString('binary')
     fs.writeFile(filename, screenshot, 'binary', function (err) {
       if (err) throw err
-      console.log('File saved.')
+      console.log(filename, 'saved.')
       resolve()
     })
   })
@@ -122,7 +123,8 @@ function getT (fx, fy) {
           (r > 200 && r < 220 && g > 235 && g < 245 && b > 220 && b < 250) ||
           (r > 190 && r < 220 && g > 215 && g < 235 && b > 235 && b < 255) ||
           (r > 170 && r < 210 && g > 185 && g < 215 && b > 235 && b < 255) ||
-          (r > 170 && r < 210 && g > 185 && g < 215 && b > 235 && b < 255)
+          (r > 170 && r < 210 && g > 185 && g < 215 && b > 235 && b < 255) ||
+          (r > 205 && r < 215 && g > 175 && g < 190 && b > 115 && b < 145)
         )
       }
 
@@ -157,15 +159,52 @@ function hold (f, t) {
     const x = Math.abs(t.x - f.x)
     const y = Math.abs(f.y - t.y) - 50
     const d = Math.sqrt(x * x + y * y)
-    const k = 0.0038381 // 1.47 / d
-
+    // const k = 0.0038381 // 1.47 / d
+    const s = Math.sqrt((d + 55.229) / 202.884)
     console.log(f, t)
-    console.log(`(${x}, ${y})`, '\n[distance]: ', d, ` [time]:${k * d}`)
+    console.log(`(${x}, ${y})`, `\n[distance]: ${d}`, ` [time]:${s}`)
 
-    // resolve(1.12)
-    // console.log(k)
+    resolve(s)
+  })
+}
 
-    resolve(Math.sqrt((d + 55.229) / 202.884))
+function drawPoint (from, target, screenshotIndex) {
+  return new Promise(resolve => {
+    getPixels('screenshot.png', function(err, p) {
+      if(err) {
+        console.log('Bad image path')
+        return
+      }
+
+      from = {
+        x: Math.round(from.x),
+        y: Math.round(from.y)
+      }
+
+      const points = [
+        { index: 0, rgb: 255 },
+        { index: 1, rgb: 0 },
+        { index: 1, rgb: 0 }
+      ]
+
+      const zoom = (x, y) => (rgb, value) => {
+        for (let i = -1; i < 2; i++) {
+          for (let j = -1; j < 2; j++) {
+            p.set(x + i, y + j, rgb, value)
+          }
+        }
+      }
+
+      points.forEach((point) => {
+        zoom(from.x, from.y)(point.index, point.rgb)
+        zoom(target.x, target.y)(point.index, point.rgb)
+      })
+
+      const writableFile = fs.createWriteStream(`lastScreen${screenshotIndex}.png`)
+      savePixels(p, 'png').pipe(writableFile)
+      console.log(`lastScreen${screenshotIndex}.png saved`)
+      resolve()
+    })
   })
 }
 
@@ -176,34 +215,26 @@ async function main () {
 
   let promise = Promise.resolve(true)
 
+  let i = 0
+
   setInterval(function () {
     promise = promise.then(() =>
       new Promise(resolve => {
-        rockIt(resolve)
+        rockIt(resolve, i++)
       })
     )
-  }, 5000)
+  }, 6000)
 
-  async function rockIt (go) {
+  async function rockIt (go, i) {
     screenshot = await getScreenshot()
     await saveImg(screenshot, 'screenshot.png')
     const from = await getI()
-    let target = await getT(from.x, from.y)
-    if (target.x === 10) {
-      await new Promise(resolve => {
-        setTimeout(async function () {
-          screenshot = await getScreenshot()
-          await saveImg(screenshot, 'screenshot.png')
-          target = await getT(from.x, from.y)
-          resolve()
-        }, 2000)
-      })
-    }
+    const target = await getT(from.x, from.y)
+
     const s = await hold(from, target)
-    console.log(s)
 
     if (s) {
-      await saveImg(screenshot, 'lastScreen.png')
+      await drawPoint(from, target, i)
       await jump(s)
       go()
     }
