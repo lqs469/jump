@@ -1,5 +1,5 @@
-import fetch from 'node-fetch'
 import fs from 'fs'
+import fetch from 'node-fetch'
 import getPixels from 'get-pixels'
 import savePixels from 'save-pixels'
 
@@ -8,6 +8,7 @@ var sid = ''
 var source = ''
 var jumpBtnId = ''
 var screenshot = ''
+var i = 0
 
 const get = (u, o) => fetch(u, o).then(res => res.json())
 
@@ -59,7 +60,9 @@ function jump (s) {
       body: JSON.stringify({
         duration: s
       })
-    }).then(data => resolve(data))
+    }).then(data => {
+      resolve(data)
+    })
   })
 }
 
@@ -92,15 +95,13 @@ function getI () {
           const b = p.get(i, j, 2)
 
           if (r < 65 && r > 55 && g < 60 && g > 50 && b < 95 && b > 85) {
-            // console.log('got From pixels', `${r}, ${g} ,${b}`)
             iX += i
             iY += j
             iN++
           }
         }
       }
-      // console.log(iX / iN, iY / iN)
-      resolve({ x: iX / iN - 5, y: iY / iN + 20 })
+      resolve({ x: iX / iN - 7, y: iY / iN + 20 })
     })
   })
 }
@@ -114,41 +115,82 @@ function getT (fx, fy) {
       }
 
       const isBG = (r, g, b) => {
+        function hex2RGB (hex) {
+            var rgb = []
+            for(var i = 1; i < 7; i += 2){
+              rgb.push(parseInt('0x' + hex.slice(i, i + 2)))
+            }
+          return rgb
+        }
+
+        const inGradient = (startHex, endHex) => {
+          const sColor = hex2RGB(startHex)
+          const eColor = hex2RGB(endHex)
+          const inR = Math.min(eColor[0], sColor[0]) <= r && Math.max(eColor[0], sColor[0]) >= r
+          const inG = Math.min(eColor[1], sColor[1]) <= g && Math.max(eColor[1], sColor[1]) >= g
+          const inB = Math.min(eColor[2], sColor[2]) <= b && Math.max(eColor[2], sColor[2]) >= b
+          return (inR && inG && inB)
+        }
+
         return (
-          (r < 150 && r > 40 && g < 151 && g > 40 && b < 162 && b > 59) ||
-          (r > 192 && r < 230 && g > 195 && g < 221 && b > 200 && b < 234) ||
-          (r > 240 && r < 256 && g > 200 && g < 230 && b > 200 && b < 225) ||
-          (r > 240 && r < 256 && g > 200 && g < 225 && b > 130 && b < 170) ||
-          (r > 240 && r < 256 && g > 240 && g < 250 && b > 155 && b < 190) ||
-          (r > 200 && r < 220 && g > 235 && g < 245 && b > 220 && b < 250) ||
-          (r > 190 && r < 220 && g > 215 && g < 235 && b > 235 && b < 255) ||
-          (r > 170 && r < 210 && g > 185 && g < 215 && b > 235 && b < 255) ||
-          (r > 170 && r < 210 && g > 185 && g < 215 && b > 235 && b < 255) ||
-          (r > 205 && r < 215 && g > 175 && g < 190 && b > 115 && b < 145)
+          inGradient('#28283B', '#9697A2') ||
+          inGradient('#FDDA9D', '#FEC983') ||
+          inGradient('#B7B2B6', '#A79AA1') ||
+          inGradient('#CBB7A7', '#CC9E98') ||
+          inGradient('#D9F3FD', '#D1E9D4') ||
+          inGradient('#DBEBFF', '#BAD5EA') ||
+          inGradient('#D7DAFE', '#A6B1E6') ||
+          inGradient('#D6DAE5', '#BBBEC7') ||
+          inGradient('#FFDEA6', '#FEC983') ||
+          inGradient('#FFE6DB', '#FEC4CC') ||
+          inGradient('#FFF8BA', '#FDF490')
+          // (r < 176 && r > 40 && g < 151 && g > 40 && b < 162 && b > 58) ||
+          // (r > 192 && r < 240 && g > 195 && g < 221 && b > 200 && b < 234) ||
+          // (r > 240 && r < 256 && g > 200 && g < 230 && b > 200 && b < 225) ||
+          // (r > 240 && r < 256 && g > 200 && g < 225 && b > 130 && b < 170) ||
+          // (r > 240 && r < 256 && g > 240 && g < 250 && b > 155 && b < 190) ||
+          // (r > 190 && r < 220 && g > 210 && g < 245 && b > 220 && b < 256) ||
+          // (r > 170 && r < 210 && g > 185 && g < 215 && b > 235 && b < 256) ||
+          // (r > 205 && r < 215 && g > 175 && g < 190 && b > 115 && b < 145) ||
+          // (r > 230 && r < 240 && g > 235 && g < 245 && b > 180 && b < 220) ||
+          // (r > 150 && r < 175 && g > 155 && g < 175 && b > 170 && b < 190)
         )
       }
 
+      const findXCenter = (i, j, r, g, b, tot = 0) => {
+        if (i < 11) {
+          return 0
+        }
+        while (r === p.get(i++, j, 0) && g === p.get(i++, j, 1) && b === p.get(i++, j, 2)) {
+          tot++
+        }
+        console.log('tot', tot)
+        return Math.round(tot / 2)
+      }
+
       function getFristCube () {
-        for (let j = 250; j < fy - 100; j++) {
+        for (let j = 400; j < fy - 50; j++) {
           for (let i = 10; i < p.shape[0] - 10; i++) {
             const r = p.get(i, j, 0)
             const g = p.get(i, j, 1)
             const b = p.get(i, j, 2)
 
-            if (!isBG(r, g, b)) {
-              console.log(r, g, b, i, j)
-              return { i, j }
+            if (!isBG(r, g, b) && (Math.abs(i - fx) > 30)) {
+              const centerX = findXCenter(i, j, r, g, b)
+              console.log(i, '====>', i + centerX)
+              console.log(r, g, b, i + centerX, j)
+              return { i: i + centerX, j }
             }
           }
         }
+        return
       }
 
       try {
         const { i, j } = getFristCube()
-        resolve({ x: i, y: j })
+        resolve({ x: i, y: j + 35 })
       } catch (e) {
-        const { i, j } = getFristCube()
-        resolve({ x: i, y: j })
+        resolve({ x: 0, y: 0 })
       }
     })
   })
@@ -157,10 +199,10 @@ function getT (fx, fy) {
 function hold (f, t) {
   return new Promise(resolve => {
     const x = Math.abs(t.x - f.x)
-    const y = Math.abs(f.y - t.y) - 50
+    const y = Math.abs(f.y - t.y)
     const d = Math.sqrt(x * x + y * y)
-    // const k = 0.0038381 // 1.47 / d
     const s = Math.sqrt((d + 55.229) / 202.884)
+    // const s = Math.sqrt((d + 100) / 321.6) // iphoneX
     console.log(f, t)
     console.log(`(${x}, ${y})`, `\n[distance]: ${d}`, ` [time]:${s}`)
 
@@ -198,11 +240,41 @@ function drawPoint (from, target, screenshotIndex) {
       points.forEach((point) => {
         zoom(from.x, from.y)(point.index, point.rgb)
         zoom(target.x, target.y)(point.index, point.rgb)
+
+        let i = target.x
+        let j = target.y
+        const r = p.get(i, j, 0)
+        const g = p.get(i, j, 1)
+        const b = p.get(i, j, 2)
+        while (r === p.get(i, j, 0) && g === p.get(i, j, 1) && b === p.get(i, j, 2)) {
+          i++
+          zoom(i, j)(point.index, point.rgb)
+        }
       })
 
       const writableFile = fs.createWriteStream(`lastScreen${screenshotIndex}.png`)
       savePixels(p, 'png').pipe(writableFile)
-      console.log(`lastScreen${screenshotIndex}.png saved`)
+      console.log(`[lastScreen${screenshotIndex}.png saved]`)
+      resolve()
+    })
+  })
+}
+
+function restart () {
+  return new Promise(resolve => {
+    get(`${url}/session/${sid}/wda/touchAndHold`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        duration: 0.0001,
+        x: 400,
+        y: 1050
+      })
+    }).then(data => {
+      i = 0
+
       resolve()
     })
   })
@@ -213,19 +285,10 @@ async function main () {
   source = await getSource()
   jumpBtnId = await getJumpBtn()
 
-  let promise = Promise.resolve(true)
 
-  let i = 0
+  const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
-  setInterval(function () {
-    promise = promise.then(() =>
-      new Promise(resolve => {
-        rockIt(resolve, i++)
-      })
-    )
-  }, 6000)
-
-  async function rockIt (go, i) {
+  async function rockIt (i) {
     screenshot = await getScreenshot()
     await saveImg(screenshot, 'screenshot.png')
     const from = await getI()
@@ -233,12 +296,20 @@ async function main () {
 
     const s = await hold(from, target)
 
-    if (s) {
+    if (s && target.x > 10) {
       await drawPoint(from, target, i)
       await jump(s)
-      go()
+    } else {
+      console.log('[restart !]')
+      await restart()
     }
+
+    const randomWait = 3000 // Math.random() * 1 + 5
+    await sleep(randomWait)
+    rockIt(++i)
   }
+
+  rockIt(i)
 }
 
 main()
