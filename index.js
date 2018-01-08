@@ -2,6 +2,7 @@ import fs from 'fs'
 import fetch from 'node-fetch'
 import getPixels from 'get-pixels'
 import savePixels from 'save-pixels'
+import sharp from 'sharp'
 
 const url = 'http://127.0.0.1:8100'
 var sid = ''
@@ -78,9 +79,9 @@ function saveImg (screenshot, filename) {
   })
 }
 
-function getI () {
+function getI (filename) {
   return new Promise(resolve => {
-    getPixels('screenshot.png', function(err, p) {
+    getPixels(filename, function(err, p) {
       if(err) {
         console.log('Bad image path')
         return
@@ -94,6 +95,7 @@ function getI () {
           const g = p.get(i, j, 1)
           const b = p.get(i, j, 2)
 
+          // if (r < 40 && r > 33 && g < 40 && g > 33 && b < 40 && b > 33) {
           if (r < 65 && r > 55 && g < 60 && g > 50 && b < 95 && b > 85) {
             iX += i
             iY += j
@@ -106,9 +108,9 @@ function getI () {
   })
 }
 
-function getT (fx, fy) {
+function getT (filename, fx, fy) {
   return new Promise(resolve => {
-    getPixels('screenshot.png', function(err, p) {
+    getPixels(filename, function(err, p) {
       if(err) {
         console.log('Bad image path')
         return
@@ -133,6 +135,7 @@ function getT (fx, fy) {
         }
 
         return (
+          // inGradient('#E1E1E1', '#D1D1D1')
           inGradient('#28283B', '#9697A2') ||
           inGradient('#FDDA9D', '#FEC983') ||
           inGradient('#B7B2B6', '#A79AA1') ||
@@ -175,7 +178,7 @@ function getT (fx, fy) {
             const g = p.get(i, j, 1)
             const b = p.get(i, j, 2)
 
-            if (!isBG(r, g, b) && (Math.abs(i - fx) > 30)) {
+            if (!isBG(r, g, b) && (Math.abs(i - fx) > 50)) {
               const centerX = findXCenter(i, j, r, g, b)
               console.log(i, '====>', i + centerX)
               console.log(r, g, b, i + centerX, j)
@@ -188,7 +191,7 @@ function getT (fx, fy) {
 
       try {
         const { i, j } = getFristCube()
-        resolve({ x: i, y: j + 35 })
+        resolve({ x: i, y: j })
       } catch (e) {
         resolve({ x: 0, y: 0 })
       }
@@ -210,9 +213,9 @@ function hold (f, t) {
   })
 }
 
-function drawPoint (from, target, screenshotIndex) {
+function drawPoint (filename, from, target, screenshotIndex) {
   return new Promise(resolve => {
-    getPixels('screenshot.png', function(err, p) {
+    getPixels(filename, function(err, p) {
       if(err) {
         console.log('Bad image path')
         return
@@ -280,6 +283,17 @@ function restart () {
   })
 }
 
+function sharpHandle (screenshot) {
+  return new Promise(resolve => {
+    screenshot = new Buffer(screenshot, 'base64')
+
+    sharp(screenshot)
+    // .sharpen(1, 10000, 10000)
+    // .greyscale()
+    .toFile('screenshot.png', () => resolve())
+  })
+}
+
 async function main () {
   sid = await getSId()
   source = await getSource()
@@ -290,14 +304,15 @@ async function main () {
 
   async function rockIt (i) {
     screenshot = await getScreenshot()
-    await saveImg(screenshot, 'screenshot.png')
-    const from = await getI()
-    const target = await getT(from.x, from.y)
+    // await saveImg(screenshot, 'screenshot.png')
+    await sharpHandle(screenshot)
+    const from = await getI('screenshot.png')
+    const target = await getT('screenshot.png', from.x, from.y)
 
     const s = await hold(from, target)
 
     if (s && target.x > 10) {
-      await drawPoint(from, target, i)
+      await drawPoint('screenshot.png', from, target, i)
       await jump(s)
     } else {
       console.log('[restart !]')
