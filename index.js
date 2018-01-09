@@ -83,30 +83,48 @@ function saveImg (screenshot, filename) {
 function getI (filename) {
   return new Promise(resolve => {
     getPixels(filename, function(err, p) {
-      if(err) {
+      if (err) {
         console.log('Bad image path')
         return
       }
       let iX = 0
       let iY = 0
       let iN = 0
-      for (let i = 0; i < p.shape[0]; i++) {
-        for (let j = 0; j < p.shape[1]; j++) {
+      for (let i = 100; i < p.shape[0] - 100; i++) {
+        for (let j = 300; j < p.shape[1] - 300; j++) {
           const r = p.get(i, j, 0)
           const g = p.get(i, j, 1)
           const b = p.get(i, j, 2)
 
           // if (r < 40 && r > 33 && g < 40 && g > 33 && b < 40 && b > 33) {
-          if (r < 65 && r > 55 && g < 60 && g > 50 && b < 95 && b > 85) {
+          // if (r < 65 && r > 55 && g < 60 && g > 50 && b < 95 && b > 85) {
+          if (inGradient('#413778', '#322364', r, g, b)) {
             iX += i
             iY += j
             iN++
           }
         }
       }
-      resolve({ x: iX / iN - 7, y: iY / iN + 20 })
+      resolve({ x: iX / iN, y: iY / iN + 20 })
     })
   })
+}
+
+const inGradient = (startHex, endHex, r, g, b) => {
+  function hex2RGB (hex) {
+      var rgb = []
+      for(var i = 1; i < 7; i += 2){
+        rgb.push(parseInt('0x' + hex.slice(i, i + 2)))
+      }
+    return rgb
+  }
+
+  const sColor = hex2RGB(startHex)
+  const eColor = hex2RGB(endHex)
+  const inR = Math.min(eColor[0], sColor[0]) <= r && Math.max(eColor[0], sColor[0]) >= r
+  const inG = Math.min(eColor[1], sColor[1]) <= g && Math.max(eColor[1], sColor[1]) >= g
+  const inB = Math.min(eColor[2], sColor[2]) <= b && Math.max(eColor[2], sColor[2]) >= b
+  return (inR && inG && inB)
 }
 
 function getT (filename, fx, fy) {
@@ -118,36 +136,25 @@ function getT (filename, fx, fy) {
       }
 
       const isBG = (r, g, b) => {
-        function hex2RGB (hex) {
-            var rgb = []
-            for(var i = 1; i < 7; i += 2){
-              rgb.push(parseInt('0x' + hex.slice(i, i + 2)))
-            }
-          return rgb
-        }
-
-        const inGradient = (startHex, endHex) => {
-          const sColor = hex2RGB(startHex)
-          const eColor = hex2RGB(endHex)
-          const inR = Math.min(eColor[0], sColor[0]) <= r && Math.max(eColor[0], sColor[0]) >= r
-          const inG = Math.min(eColor[1], sColor[1]) <= g && Math.max(eColor[1], sColor[1]) >= g
-          const inB = Math.min(eColor[2], sColor[2]) <= b && Math.max(eColor[2], sColor[2]) >= b
-          return (inR && inG && inB)
-        }
-
         return (
+          inGradient('#E0E0E0', '#C0C0C0', r, g, b) ||
+          inGradient('#E0E0E0', '#FFC9E0', r, g, b) ||
+          inGradient('#FFD4AB', '#D2946B', r, g, b) ||
+          inGradient('#FFFFCA', '#E0EB7B', r, g, b) ||
+          inGradient('#E0D5FF', '#BFB5F6', r, g, b) ||
+          inGradient('#C0C0C0', '#A0A0A0', r, g, b) ||
           // inGradient('#E1E1E1', '#D1D1D1')
-          inGradient('#28283B', '#9697A2') ||
-          inGradient('#FDDA9D', '#FEC983') ||
-          inGradient('#B7B2B6', '#A79AA1') ||
-          inGradient('#CBB7A7', '#CC9E98') ||
-          inGradient('#D9F3FD', '#D1E9D4') ||
-          inGradient('#DBEBFF', '#BAD5EA') ||
-          inGradient('#D7DAFE', '#A6B1E6') ||
-          inGradient('#D6DAE5', '#BBBEC7') ||
-          inGradient('#FFDEA6', '#FEC983') ||
-          inGradient('#FFE6DB', '#FEC4CC') ||
-          inGradient('#FFF8BA', '#FDF490')
+          inGradient('#28283B', '#9697A2', r, g, b) ||
+          inGradient('#FDDA9D', '#FEC983', r, g, b) ||
+          inGradient('#B7B2B6', '#A79AA1', r, g, b) ||
+          inGradient('#CBB7A7', '#CC9E98', r, g, b) ||
+          inGradient('#D9F3FD', '#D1E9D4', r, g, b) ||
+          inGradient('#DBEBFF', '#BAD5EA', r, g, b) ||
+          inGradient('#D7DAFE', '#A6B1E6', r, g, b) ||
+          inGradient('#D6DAE5', '#BBBEC7', r, g, b) ||
+          inGradient('#FFDEA6', '#FEC983', r, g, b) ||
+          inGradient('#FFE6DB', '#FEC4CC', r, g, b) ||
+          inGradient('#FFF8BA', '#FDF490', r, g, b)
           // (r < 176 && r > 40 && g < 151 && g > 40 && b < 162 && b > 58) ||
           // (r > 192 && r < 240 && g > 195 && g < 221 && b > 200 && b < 234) ||
           // (r > 240 && r < 256 && g > 200 && g < 230 && b > 200 && b < 225) ||
@@ -183,13 +190,11 @@ function getT (filename, fx, fy) {
                   const middle = Math.floor((i + k) / 2)
 
                   // find Y axis conter
-                  const topD = j + 25
+                  const topD = j + 20
                   const tr = p.get(middle, topD, 0)
                   const tg = p.get(middle, topD, 1)
                   const tb = p.get(middle, topD, 2)
                   let center = topD
-
-                  console.log('middle', middle)
 
                   for (let l = j; l < fy - 50; l++) {
                     const br = p.get(middle, l, 0)
@@ -265,16 +270,6 @@ function drawPoint (filename, from, target, screenshotIndex) {
       points.forEach((point) => {
         zoom(from.x, from.y)(point.index, point.rgb)
         zoom(target.x, target.y)(point.index, point.rgb)
-
-        // let i = target.x
-        // let j = target.y
-        // const r = p.get(i, j, 0)
-        // const g = p.get(i, j, 1)
-        // const b = p.get(i, j, 2)
-        // while (r === p.get(i, j, 0) && g === p.get(i, j, 1) && b === p.get(i, j, 2)) {
-        //   i++
-          // zoom(i, j)(point.index, point.rgb)
-        // }
       })
 
       const writableFile = fs.createWriteStream(`lastScreen${screenshotIndex}.png`)
@@ -306,9 +301,10 @@ function sharpHandle (screenshot) {
     screenshot = new Buffer(screenshot, 'base64')
 
     sharp(screenshot)
-    // .sharpen(1, 10000, 10000)
-    // .greyscale()
-    .toFile('screenshot.png', () => resolve())
+    .jpeg({
+      quality: 1
+    })
+    .toFile('screenshot.jpg', () => resolve())
   })
 }
 
@@ -324,13 +320,13 @@ async function main () {
     screenshot = await getScreenshot()
     // await saveImg(screenshot, 'screenshot.png')
     await sharpHandle(screenshot)
-    const from = await getI('screenshot.png')
-    const target = await getT('screenshot.png', from.x, from.y)
+    const from = await getI('screenshot.jpg')
+    const target = await getT('screenshot.jpg', from.x, from.y)
 
     const s = await hold(from, target)
 
     if (s && target.x > 10) {
-      await drawPoint('screenshot.png', from, target, i)
+      await drawPoint('screenshot.jpg', from, target, i)
       await jump(s)
     } else {
       console.log('[restart !]')
