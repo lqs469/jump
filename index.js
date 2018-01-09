@@ -3,6 +3,7 @@ import fetch from 'node-fetch'
 import getPixels from 'get-pixels'
 import savePixels from 'save-pixels'
 import sharp from 'sharp'
+import config from './config.js'
 
 const url = 'http://127.0.0.1:8100'
 var sid = ''
@@ -160,29 +161,50 @@ function getT (filename, fx, fy) {
         )
       }
 
-      const findXCenter = (i, j, r, g, b, tot = 0) => {
-        if (i < 11) {
-          return 0
-        }
-        while (r === p.get(i++, j, 0) && g === p.get(i++, j, 1) && b === p.get(i++, j, 2)) {
-          tot++
-        }
-        console.log('tot', tot)
-        return Math.round(tot / 2)
-      }
-
       function getFristCube () {
         for (let j = 400; j < fy - 50; j++) {
           for (let i = 10; i < p.shape[0] - 10; i++) {
-            const r = p.get(i, j, 0)
-            const g = p.get(i, j, 1)
-            const b = p.get(i, j, 2)
+            const lr = p.get(i, j, 0)
+            const lg = p.get(i, j, 1)
+            const lb = p.get(i, j, 2)
 
-            if (!isBG(r, g, b) && (Math.abs(i - fx) > 50)) {
-              const centerX = findXCenter(i, j, r, g, b)
-              console.log(i, '====>', i + centerX)
-              console.log(r, g, b, i + centerX, j)
-              return { i: i + centerX, j }
+            if (!isBG(lr, lg, lb) && (Math.abs(i - fx) > 50)) {
+              console.log('Frist point', i, j, lr, lg, lb)
+              if (i < 11) {
+                return { i: 0, j: 0 }
+              }
+
+              for (let k = p.shape[0] - 10; k > i; k--) {
+                const rr = p.get(k, j, 0)
+                const rg = p.get(k, j, 1)
+                const rb = p.get(k, j, 2)
+
+                if (!isBG(rr, rg, rb) && (Math.abs(k - fx) > 50)) {
+                  const middle = Math.floor((i + k) / 2)
+
+                  // find Y axis conter
+                  const topD = j + 25
+                  const tr = p.get(middle, topD, 0)
+                  const tg = p.get(middle, topD, 1)
+                  const tb = p.get(middle, topD, 2)
+                  let center = topD
+
+                  console.log('middle', middle)
+
+                  for (let l = j; l < fy - 50; l++) {
+                    const br = p.get(middle, l, 0)
+                    const bg = p.get(middle, l, 1)
+                    const bb = p.get(middle, l, 2)
+
+                    if (tr === br && tg === bg && tb === bb) {
+                      center = l
+                    }
+                  }
+                  center = Math.round((topD + center) / 2)
+                  console.log('[ center ]', middle, center)
+                  return { i: middle, j: center }
+                }
+              }
             }
           }
         }
@@ -204,7 +226,7 @@ function hold (f, t) {
     const x = Math.abs(t.x - f.x)
     const y = Math.abs(f.y - t.y)
     const d = Math.sqrt(x * x + y * y)
-    const s = Math.sqrt((d + 55.229) / 202.884)
+    const s = Math.sqrt((d + config.b) / config.k)
     // const s = Math.sqrt((d + 100) / 321.6) // iphoneX
     console.log(f, t)
     console.log(`(${x}, ${y})`, `\n[distance]: ${d}`, ` [time]:${s}`)
@@ -244,15 +266,15 @@ function drawPoint (filename, from, target, screenshotIndex) {
         zoom(from.x, from.y)(point.index, point.rgb)
         zoom(target.x, target.y)(point.index, point.rgb)
 
-        let i = target.x
-        let j = target.y
-        const r = p.get(i, j, 0)
-        const g = p.get(i, j, 1)
-        const b = p.get(i, j, 2)
-        while (r === p.get(i, j, 0) && g === p.get(i, j, 1) && b === p.get(i, j, 2)) {
-          i++
-          zoom(i, j)(point.index, point.rgb)
-        }
+        // let i = target.x
+        // let j = target.y
+        // const r = p.get(i, j, 0)
+        // const g = p.get(i, j, 1)
+        // const b = p.get(i, j, 2)
+        // while (r === p.get(i, j, 0) && g === p.get(i, j, 1) && b === p.get(i, j, 2)) {
+        //   i++
+          // zoom(i, j)(point.index, point.rgb)
+        // }
       })
 
       const writableFile = fs.createWriteStream(`lastScreen${screenshotIndex}.png`)
@@ -271,15 +293,11 @@ function restart () {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        duration: 0.0001,
+        duration: 0.00001,
         x: 400,
         y: 1050
       })
-    }).then(data => {
-      i = 0
-
-      resolve()
-    })
+    }).then(() => resolve())
   })
 }
 
