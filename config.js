@@ -1,4 +1,3 @@
-export default iphone7
 
 // Waiting for you.
 
@@ -9,3 +8,7 @@ const iphone6p = {}
 const iphoneSE = {}
 const iphone8 = {}
 const iphone8p = {}
+
+
+const config = iphone7
+export default config
