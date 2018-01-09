@@ -1,6 +1,11 @@
-const config = {
-  b: 55.229,
-  k: 188.815 // 202.884
-}
+export default iphone7
 
-export default config
+// Waiting for you.
+
+const iphone7 = { b: 55.229, k: 188.815, top: 300 }
+const iphoneX = { b: 141, k: 308.205, top:600 }
+const iphone6 = {}
+const iphone6p = {}
+const iphoneSE = {}
+const iphone8 = {}
+const iphone8p = {}

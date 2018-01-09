@@ -141,35 +141,13 @@ function getT (filename, fx, fy) {
           inGradient('#E0E0E0', '#FFC9E0', r, g, b) ||
           inGradient('#FFD4AB', '#D2946B', r, g, b) ||
           inGradient('#FFFFCA', '#E0EB7B', r, g, b) ||
-          inGradient('#E0D5FF', '#BFB5F6', r, g, b) ||
-          inGradient('#C0C0C0', '#A0A0A0', r, g, b) ||
-          // inGradient('#E1E1E1', '#D1D1D1')
-          inGradient('#28283B', '#9697A2', r, g, b) ||
-          inGradient('#FDDA9D', '#FEC983', r, g, b) ||
-          inGradient('#B7B2B6', '#A79AA1', r, g, b) ||
-          inGradient('#CBB7A7', '#CC9E98', r, g, b) ||
-          inGradient('#D9F3FD', '#D1E9D4', r, g, b) ||
-          inGradient('#DBEBFF', '#BAD5EA', r, g, b) ||
-          inGradient('#D7DAFE', '#A6B1E6', r, g, b) ||
-          inGradient('#D6DAE5', '#BBBEC7', r, g, b) ||
-          inGradient('#FFDEA6', '#FEC983', r, g, b) ||
-          inGradient('#FFE6DB', '#FEC4CC', r, g, b) ||
-          inGradient('#FFF8BA', '#FDF490', r, g, b)
-          // (r < 176 && r > 40 && g < 151 && g > 40 && b < 162 && b > 58) ||
-          // (r > 192 && r < 240 && g > 195 && g < 221 && b > 200 && b < 234) ||
-          // (r > 240 && r < 256 && g > 200 && g < 230 && b > 200 && b < 225) ||
-          // (r > 240 && r < 256 && g > 200 && g < 225 && b > 130 && b < 170) ||
-          // (r > 240 && r < 256 && g > 240 && g < 250 && b > 155 && b < 190) ||
-          // (r > 190 && r < 220 && g > 210 && g < 245 && b > 220 && b < 256) ||
-          // (r > 170 && r < 210 && g > 185 && g < 215 && b > 235 && b < 256) ||
-          // (r > 205 && r < 215 && g > 175 && g < 190 && b > 115 && b < 145) ||
-          // (r > 230 && r < 240 && g > 235 && g < 245 && b > 180 && b < 220) ||
-          // (r > 150 && r < 175 && g > 155 && g < 175 && b > 170 && b < 190)
+          inGradient('#E0D5FF', '#BFB4F6', r, g, b) ||
+          inGradient('#C0C0C0', '#A0A0A0', r, g, b)
         )
       }
 
       function getFristCube () {
-        for (let j = 400; j < fy - 50; j++) {
+        for (let j = config.top; j < fy - 50; j++) {
           for (let i = 10; i < p.shape[0] - 10; i++) {
             const lr = p.get(i, j, 0)
             const lg = p.get(i, j, 1)
@@ -232,7 +210,6 @@ function hold (f, t) {
     const y = Math.abs(f.y - t.y)
     const d = Math.sqrt(x * x + y * y)
     const s = Math.sqrt((d + config.b) / config.k)
-    // const s = Math.sqrt((d + 100) / 321.6) // iphoneX
     console.log(f, t)
     console.log(`(${x}, ${y})`, `\n[distance]: ${d}`, ` [time]:${s}`)
 
@@ -312,7 +289,6 @@ async function main () {
   sid = await getSId()
   source = await getSource()
   jumpBtnId = await getJumpBtn()
-
 
   const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
