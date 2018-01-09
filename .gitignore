@@ -1,3 +1,8 @@
 *.png
 findNode.js
+sharp.js
+index.html
+tmp.*
+screenshot.*
 node_modules
+*.lock
