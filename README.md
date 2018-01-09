@@ -87,3 +87,9 @@ npm start
 配置文件 `/config.json`
 
 我使用的iphone7, 也是配置文件中默认参数, 欢迎其他设备的同学提供对应的设备参数(PR, issue均可).
+
+- [] iPhoneX
+- [X] iPhone7
+- [] iPhone7P
+- [] iPhone6P
+- [] iPhoneSE
