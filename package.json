@@ -1,7 +1,8 @@
 {
   "name": "jump",
   "version": "1.0.0",
-  "description": "",
+  "description": "Jump",
+  "private": true,
   "main": "index.js",
   "scripts": {
     "start": "babel-node index.js",
@@ -9,16 +10,21 @@
     "sharp": "babel-node sharp.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "lqs469",
+  "license": "MIT",
   "dependencies": {
     "get-pixels": "^3.3.0",
     "ndarray-unpack": "^1.0.0",
     "node-fetch": "^1.7.3",
-    "save-pixels": "^2.3.4"
+    "save-pixels": "^2.3.4",
+    "sharp": "^0.18.4"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-es2015": "^6.24.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:lqs469/jump.git"
   }
 }
