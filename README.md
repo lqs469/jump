@@ -90,8 +90,8 @@ npm start
 
 - [X] iPhoneX
 - [X] iPhone7
+- [X] iPhoneSE // 由Lobster-King提供
 - [ ] iPhone7P
 - [ ] iPhone6P
-- [ ] iPhoneSE
 - [ ] iPhone8
 - [ ] iPhone8P
