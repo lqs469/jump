@@ -15,7 +15,7 @@
   "dependencies": {
     "get-pixels": "^3.3.0",
     "ndarray-unpack": "^1.0.0",
-    "node-fetch": "^1.7.3",
+    "node-fetch": "^2.6.1",
     "save-pixels": "^2.3.4",
     "sharp": "^0.18.4"
   },
