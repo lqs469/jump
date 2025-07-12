@@ -13,7 +13,7 @@
   "author": "lqs469",
   "license": "MIT",
   "dependencies": {
-    "get-pixels": "^3.3.0",
+    "get-pixels": "^3.3.3",
     "ndarray-unpack": "^1.0.0",
     "node-fetch": "^3.2.10",
     "save-pixels": "^2.3.6",
